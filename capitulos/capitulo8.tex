@@ -1,0 +1,169 @@
+\chapter{Pruebas y resultados} \label{chap:pruebas}
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black]
+Pings y referencias, rutas...Gestión de redes
+Podría estar bien hacer alguna captura del tráfico generado en las interfaces de red creadas.
+\end{tcolorbox}
+
+\subsection{Acceso a las instancias}
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black]
+Explicar las distintas formas de acceder a la instancia para comprobar que funciona.
+\begin{itemize}
+\item ip netns
+\item vía Horizon. Connecting to the instance antes adding store Horizon
+\item ssh
+\end{itemize}
+
+\end{tcolorbox}
+
+Una vez que hemos conseguido levantar una instancia, tenemos varias formas de comprobar si esta es accesible y por tanto se ha creado con éxito.
+
+Si estamos dentro de horizon dentro de “Proyecto-\textgreater Compute-\textgreater Instancias” podremos ver por ejemplo, la instancia creada desde horizon con el nombre “horizon-user” con una dirección IP, un flavor, un par de claves, etc. Para asegurarnos de que podemos conectarnos a ella tenemos varias opciones. La forma más sencilla es abrir una consola de la instancia desde Horizon, seleccionando “Consola” dentro del campo “Acciones” como mostramos en la %\Fig.\ref{mostarConsola}
+.
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black]
+FALTA FIGURA....................................................
+
+....................................................FALTA FIGURA
+\end{tcolorbox}
+
+
+\begin{comment}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/capitulo8/mostarConsola.PNG}
+    \caption{Abriendo consola de la instancia.}
+	\vspace{0.3cm}
+    \label{mostarConsola}
+\end{figure}
+\end{comment}
+
+Y vemos en la %Fig.\ref{consolaInstanciaHorizon}
+como se abre una consola con la instancia creada en la que para ver que efectivamente se trata de la nombrada como “horizon-user” hemos puesto el comando \textit{ip a} para ver que se trata de las intancia con IP 192.170.1.103/24.
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black]
+FALTA FIGURA....................................................
+
+....................................................FALTA FIGURA
+\end{tcolorbox}
+
+
+\begin{comment}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/capitulo8/consolaInstanciaHorizon.PNG}
+    \caption{Consola de la instancia de cirros horizon-instance-1.}
+	\vspace{0.3cm}
+    \label{consolaInstanciaHorizon}
+\end{figure}
+\end{comment}
+
+A pesar de ser una forma fácil de acceder a la instancia no es la más útil desde el punto de vista del usuario final. Por ello, vamos ahora a ver otra opción de acceso y comprobación de que se puede alcanzar de forma externa.
+
+\begin{lstlisting}[style=Consola]
+stack@wimunet4:~/devstack$ ip netns show
+\end{lstlisting}
+
+El comando ip netns show ejecutado desde una consola de alguna máquina en la que tengamos instalado OpenStack, nos muestra los distintos \textit{namespaces}, o espacios de nombres que se utilizan para implementar redes definidas por software.
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black]
+FALTA FIGURA....................................................
+
+....................................................FALTA FIGURA
+\end{tcolorbox}
+
+
+\begin{comment}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/capitulo8/ipnetnsshow.PNG}
+    \caption{Openstack namespaces.}
+	\vspace{0.3cm}
+    \label{ipnetnsshow}
+\end{figure}
+\end{comment}
+
+
+%“” 
+
+La salida del comando podemos verla en la %Fig.\ref{ipnetnsshow}
+El espacio de nombres “qrouter” representa a los routers que hayamos creado. La utilidad de usar namespaces reside en que se crea una red completamente aislada en el nivel de Linux. Así sí escribiéramos \textit{ip a}, podríamos ver que existen distintas interfaces de red, como por ejemplo “enp3s0”, con una IP determinada, pero no veremos nada de lo que está sucediendo dentro del espacio de nombres de “qrouter”.
+
+Por tanto, para poder hacer ping o conectarnos a la instancia creada, necesitamos ejecutar comandos en el espacio de nombres de “qrouter”. Para ello escribimos:
+
+\begin{lstlisting}[style=Consola]
+stack@wimunet4:~/devstack$ sudo ip netns exec qrouter-45654247-1b47-457e-a2de-b9aae46595dc ip a
+\end{lstlisting}
+
+Con este comando, estamos ejecutando \textit{ip a} dentro del espacio de nombres del router que conecta nuestra instancia con la red externa, obtiendo como salida la mostrada en la %Fig.\ref{pingQrotuer} 
+en la que ahora sí, podemos ver la red externa (10.5.1.232/24) e interna (192.170.1.1/24) de la instancia creada. Como se aprecia en la figura también podremos hacer ping con utilizando el espacio de nombres del router y la IP de la instancia creada:
+
+\begin{lstlisting}[style=Consola]
+stack@wimunet4:~/devstack$ sudo ip netns exec qrouter-45654247-1b47-457e-a2de-b9aae46595dc ping 192.170.1.103
+\end{lstlisting}
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black]
+FALTA FIGURA....................................................
+
+....................................................FALTA FIGURA
+\end{tcolorbox}
+
+
+\begin{comment}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/capitulo8/pingQrotuer.PNG}
+    \caption{Interfaz y ping a la instancia mediante namespaces.}
+	\vspace{0.3cm}
+    \label{pingQrotuer}
+\end{figure}
+\end{comment}
+
+Por tanto, ya sabemos que podemos hacer ping a la instancia, pero también deseamos verificar si tenemos acceso a la misma. Para ello, vamos a usar de nuevo \textit{ip netns exec} pero esta vez ejecutando el comando ssh para conectarnos a la instancia usando la clave privada asociada a la instancia:
+
+\begin{lstlisting}[style=Consola]
+stack@wimunet4:~/devstack/.ssh$ sudo ip netns exec qrouter-45654247-1b47-457e-a2de-b9aae46595dc ssh -i horizon-keypair cirros@192.170.1.103
+\end{lstlisting}
+
+En este comando estamos usando de nuevo el espacio de nombres de “qrouter” y ejecutamos el comando \textit{ssh -i horizon-keypair} en dicho espacio donde como sabemos \textit{horizon-keypair} es el arichivo de clave privada que contiene las credenciales para iniciar sesión en la instancia. Accedemos como usuario \textit{cirros} a la IP 192.170.1.103, la asignada a la instancia \textit{horizon-instance-1}. Como resultado, en la %Fig.\ref{sshInstanceQrouter}
+podemos ver que nos hemos conectado a la instancia deseada vía ssh donde además hemos escrito \textit{ip a} para comprobar que efecitvamente estamos dentro de esa máquina, con IP 192.170.1.103.
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!75!black]
+FALTA FIGURA....................................................
+
+....................................................FALTA FIGURA
+\end{tcolorbox}
+
+
+\begin{comment}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imagenes/capitulo8/sshInstanceQrouter.PNG}
+    \caption{Acceso vía ssh usando namespaces.}
+	\vspace{0.3cm}
+    \label{sshInstanceQrouter}
+\end{figure}
+\end{comment}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black]
+La forma realmente útil implica configurar direcciones IP flotantes también. C6.
+\end{tcolorbox}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,132 @@
+\chapter{Archivos de configuración para la instalación} \label{chap:manualdeinstalacion}
+
+\section{Archivo de configuración del Servidor 1}\label{sec:ConfServer1}
+En esta sección del apéndice mostramos el archivo de configuración \textit{local.conf} que contiene la configuración necesaria para la instalación de openStack en el Servidor 1 junto con la descripción de los mismos.
+
+\begin{itemize}
+\item Archivo de configuración \textit{local.conf} para el Servidor 1:
+\end{itemize}
+
+\begin{lstlisting}[style=Consola]
+stack@jorge-All-Series:~/devstack$ vi local.conf
+
+[[local|localrc]]
+###########################################################
+# Configurando el entorno a crear
+###########################################################
+PUBLIC_INTERFACE=enp3s0
+HOST_IP=10.5.1.201
+FLOATING_RANGE=10.5.1.224/24
+FLAT_INTERFACE=enp3s0:1
+Q_FLOATING_ALLOCATION_POOL=start=10.5.1.224,end=10.5.1.254
+
+# Claves de acceso para los distintos servicios
+ADMIN_PASSWORD=temporary
+MYSQL_PASSWORD=temporary
+RABBIT_PASSWORD=temporary
+SERVICE_PASSWORD=$ADMIN_PASSWORD
+SERVICE_TOKEN=temporary
+
+# Configuramos el primer servidor como la primera region
+REGION_NAME=RegionOne
+
+############################################################
+# Customizando entorno
+############################################################
+# Permitir el uso de Pip para manejo de paquetes
+PIP_USE_MIRRORS=False
+USE_GET_PIP=1
+
+#OFFLINE=False
+# Reclone nos permite reconstruir los escenarios creados en caso de reinicio del servidor
+RECLONE=True
+
+# Habilitar log para reportes de fallos y otros.
+LOGFILE=$DEST/logs/stack.sh.log
+VERBOSE=True
+ENABLE_DEBUG_LOG_LEVEL=True
+ENABLE_VERBOSE_LOG_LEVEL=True
+
+# Neutron ML2 with OpenVSwitch
+Q_PLUGIN=ml2
+Q_AGENT=openvswitch
+
+# Habilitar grupos de seguridad
+Q_USE_SECGROUP=False
+LIBVIRT_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
+
+# Habilitar Heat
+enable_plugin heat https://git.openstack.org/openstack/heat stable/queens
+# Habilitar Heat para su uso desde el Dashboard
+enable_plugin heat-dashboard https://git.openstack.org/openstack/heat-dashboard stable/queens
+# Habilitar funciones de red
+enable_plugin networking-sfc git://git.openstack.org/openstack/networking-sfc stable/queens
+
+# Descarga de automatica de imagenes para el servicio de Heat.
+IMAGE_URL_SITE="http://download.cirros-cloud.net"
+IMAGE_URL_PATH="/0.4.0/"
+IMAGE_URL_FILE="cirros-0.4.0-x86_64-disk.img"
+IMAGE_URLS+=","$IMAGE_URL_SITE$IMAGE_URL_PATH$IMAGE_URL_FILE
+
+# Habilitar Ceilometer
+enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer stable/queens
+# Habilitar Tacker
+enable_plugin tacker https://git.openstack.org/openstack/tacker stable/queens
+# Habilitar Tacker para su uso desde Horizon
+https://git.openstack.org/cgit/openstack/tacker-horizon stable/queens
+
+# Servicios adicionales para Nova
+enable_service n-novnc
+enable_service n-cauth
+disable_service tempest
+[[post-config|/etc/neutron/dhcp_agent.ini]]
+[DEFAULT]
+enable_isolated_metadata = True
+\end{lstlisting}
+
+\begin{itemize}
+\item Descripción de los parámetros principales del archivo de configuración \textit{local.conf} no descritos en el mismo:
+
+\begin{itemize}
+\item Cabecera del archivo, es obligatoria. [[local|localrc]]. 
+\item PUBLIC\_INTERFACE=enp3s0. Intefaz de red física que servirá como gateway hacia la red pública.
+\item HOST\_IP=10.5.1.201. Dirección IP del host que alojará OpenStack.
+\item FLOATING\_RANGE=10.5.1.224/24. Rango de direcciones IPs flotantes.
+\item FLAT\_INTERFACE=enp3s0:1. Interfaz de red que conecta el entorno creado a nuestra máquina.
+\item Q\_FLOATING\_ALLOCATION\_POOL=start=10.5.1.224,end=10.5.1.254. A pesar de haber creado un rago de IPs flotantes, podemos establecer únicamente una cantidad de direcciones en ese rango de las que disponer.
+\item Claves de acceso para los distintos servicios. Después de estos parámetros, en el arhcivo se usan distintas contraseñas: una para el administrador del entorno cloud creado con acceso a la conguracion completa, otra para la base de
+datos que se especifica que sea MySQL, otra para la cola de mensajes RabbitMQ incorporada por defecto en este paquete  y por ultimo la contraseña de servicio predeterminada para la autenitación en Keystone de los servicios.
+\end{itemize}
+\end{itemize}
+
+El resto de parámetros se describen en el propio archivo. Como se puede ver se especifica que este Servidor haga las veces de la región One.
+
+\section{Archivo de configuración del Servidor 2}\label{sec:ConfServer2}
+En el caso del Servidor 2 la configuración es la que sigue:
+
+\begin{lstlisting}[style=Consola]
+[[local|localrc]]
+############################################################
+# Configurando el entorno a crear
+############################################################
+PUBLIC_INTERFACE=enp0s31f6
+HOST_IP=10.5.3.201
+FLOATING_RANGE=10.5.3.224/24
+FLAT_INTERFACE=enp0s31f6:2
+Q_FLOATING_ALLOCATION_POOL=start=10.5.3.224,end=10.5.3.254
+
+ADMIN_PASSWORD=temporary
+MYSQL_PASSWORD=temporary
+RABBIT_PASSWORD=temporary
+SERVICE_PASSWORD=$ADMIN_PASSWORD
+SERVICE_TOKEN=temporary
+
+# Para primer escenario, segunda region.
+disable_service horizon
+KEYSTONE_SERVICE_HOST=10.5.1.201
+KEYSTONE_AUTH_HOST=10.5.1.201
+REGION_NAME=RegionTwo
+KEYSTONE_REGION_NAME=RegionOne
+\end{lstlisting}
+
+Los parámetros de configuración del entorno en este caso se adaptan a las interfaces de red del Servidor 2. Además se indicaa que se trata de la región Two y que el servicio de autenticación estará al cargo de la región One de la cual indicamos también su IP.

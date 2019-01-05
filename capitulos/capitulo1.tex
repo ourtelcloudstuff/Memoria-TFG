@@ -1,0 +1,123 @@
+\chapter{Introducción} 
+\label{chap:introudccion}
+En la actualidad los servicios IT han alcanzado un papel crítico en el desarrollo de nuestra sociedad, haciendo que surjan tecnologías como la computación en la nube, la virtualización, o la orquestación de estos elementos virtuales, que ahora marcan el camino a seguir en los despliegues de cualquier infraestructura de red. Dentro de este ámbito, es imprescindible dotar a todos los servicios que existen de mecanismos de gestión y aprovechamiento de los recursos para complacer las demandas de los usuarios asegurando alta disponibilidad.
+
+Este primer capítulo tiene como fin hacer una primera presentación de los aspectos relacionados con el trabajo fin de grado. En primer lugar vamos a describir algunos detalles que nos ayudarán a contextualizar las tecnologías implicadas para, a continuación, exponer las metas que nos proponemos alcanzar a lo largo del desarrollo del mismo.
+
+Hablaremos también de la situación actual de los desarrollos \textit{cloud} basados en OpenStack y la relevancia que tiene en los despliegues en entornos de producción hoy día.
+
+Finalmente, subrayaremos la estructura del resto de la memoria incluyendo la descripción de cada uno de los capítulos y apéndices incluidos en esta memoria.
+
+\section{Contexto y motivación}
+\textit{Cloud computing} es un paradigma de computación que permite ofrecer recursos de computación a través de la red. Estos recursos (redes, almacenamiento, cómputo, servidores, aplicaciones, servicios) se ofrecen bajo demanda y pueden ser suministrados con una mínima interacción y gestión por parte del proveedor del servicio.
+
+Este es el punto en el que OpenStack entra en juego. El proyecto OpenStack se define así mismo como una plataforma de cloud computing hecha con software libre para desplegar nubes públicas y privadas orientadas a ofrecer infraestructuras como servicio (\textit{Infrastructure as a Service, IaaS}) a los usuarios, desarrollada con la idea de ser sencilla de implementar, masivamente escalable y con muchas prestaciones.
+
+OpenStack está creciendo a un ritmo sin precedentes. Prueba de ello es el hecho de que el 65\% de las implementaciones de \textit{cloud} en  producción y el 96\% de quienes están llevando acabo despliegues de VNFs (\textit{Virtual Network Functions}) lo usan, convirtiéndose así en una parte esencial de las nuevas infraestructuras de red \cite{noauthor_openstack-annualreport2017.pdf_nodate}. Otra muestra de la relevancia de este proyecto es el hecho de que, según el informe de trabajos de código abierto de \textit{The Linux Foundation and Dice} \cite{foundation_new_2018}, el 64\% de los gerentes de contratación dice que la experiencia con OpenStack y otras tecnologías en la nube están impulsando las decisiones de contratación en trabajos relacionados con el despliegue de infraestructuras de \textit{data centers}, \textit{cloud} y virtualización.
+
+Por tanto, un motivo fundamental a la hora de considerar esta herramienta para el presente trabajo es el creciente uso en despliegues profesionales de tecnologías IT y el papel fundamental que OpenStack tiene hoy día en el desarrollo de despliegues de redes virtuales, gestión de NFV (\textit{Network Fuction Virtualization}), centros de datos, \textit{edge computing}, contenedores y entornos \textit{cloud}.
+
+Otro aspecto importante a la hora de desarrollar el proyecto, es la cantidad de nuevas tecnologías que se pueden usar y con las que se trabaja en este tipo de entornos, conociendo así el alcance que puede llegar a tener OpenStack.
+
+También resulta relevante el cambio de enfoque respecto a los centros de datos convencionales. En el enfoque tradicional de implementación de centros de datos con máquinas físicas existen muchos recursos desaprovechados, en contraposición con el enfoque de computación en la nube, donde los recursos se comparten globalmente permitiendo una mayor elasticidad y reduciendo así costes en espacio y nuevos medios entre otros.
+
+Otro buen motivo para trabajar con esta herramienta es el hecho de que es \textit{Open Source}. OpenStack es una plataforma de \textit{cloud computing} cuyo desarrollo se basa en Licencia Apache 2.0 \cite{noauthor_open_nodate}, una licencia libre que nos permite acceder al código fuente y modificarlo o realizar aportaciones y que además no hace uso de funcionalidades de pago.
+
+\section{Objetivos y alcance del proyecto}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black]
+% * <atj.itt@gmail.com> 2018-09-02T17:17:57.771Z:
+% 
+% aa
+% 
+% ^ <atj.itt@gmail.com> 2018-09-02T17:18:07.122Z.
+\begin{itemize}
+\item Indicar alcance de cada objetivo.
+\item Indicar las interdependencias entre los objetivos y también enlazarlos con los diferentes apartados de la memoria.
+\item Destacar aspectos formativos previos más utilizados en este apartado.
+\item ¿Es conveniente listar en puntos objetivos o se entiende de este modo lo que se trata de conseguir?
+\end{itemize}
+
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=orange!5!white,colframe=orange!75!black]
+Jorge: IMPORTANTE. Como dices en el cuadro, debes expresar claramente los objetivos. Queremos crear una nube que pueda orquestar funciones de red virtuales, de forma que si una se cae, se levante en otro sitio automáticamente. Este es el objetivo principal. Y después, desarrolla los subobjetivos que veas.
+\end{tcolorbox}
+
+El proyecto actual se lleva acabo como reto personal en el que se pretende conseguir crear un entorno de \textit{cloud} privado preparado para implementar en un futuro cualquier servicio que se quisiera dar, dotando a la infraestructura de mecanismos de orquestación, escalabilidad y redundancia de funciones de red y recursos, de modo que aseguremos alta disponibilidad frente a catástrofes como puedan ser terremotos, incendios, cortes de luz o fallos en el sistema de cualquier otra índole.
+
+En primer lugar, comenzaremos haciendo un repaso de las tecnologías y conceptos implicados en la realización del presente trabajo y también de nociones varias que nos ayudarán a comprender el alcance que puede llegar a tener el uso de OpenStack.
+
+Pasaremos después a ver las distintas opciones o herramientas similares que tenemos a la hora de desplegar nuestro entorno de trabajo. Una vez seleccionadas las opciones oportunas que iremos viendo y justificando, realizaremos el despliegue de nuestra infraestructura.
+
+Antes de realizar dicho despliegue, será importante hacer una planificación exhaustiva tanto de los recursos hardware, software y otros posibles que puedan estar implicados así como de los costes que conllevan.
+
+Con todo ello, plantearemos el diseño de la infraestructura razonando los motivos que nos han llevado a optar por esa vía para a continuación realizar la instalación de la misma.
+
+\jorge{Ten cuidado cuando usas ''implementar''. Desplegar OpenStack puede ser instalar, configurar, desplegar, ... pero implementar me suena más a crear código. En el caso de los escenarios sí los has implementado, porque tú has escrito los scripts (o a través del GUI) para generarlos, no es una mera instalación y configuración.}
+
+Una vez este a punto nuestra infraestructura, veremos como podemos realizar la gestión de la plataforma para crear nuestra \textit{cloud} privada tanto vía web con la ayuda de uno de los proyectos de OpenStack, como desde línea de comandos y de manera automatizada, creando redes, cortafuegos, máquinas virtuales y asignando recursos a estas máquinas entre otras posibilidades que nos permitirán sacarle el máximo partido a los escenarios creados.
+
+Una vez creados los escenarios, veremos distintos métodos para realizar la gestión de algunas funciones de red, de forma que aseguremos la disponibilidad de las instancias creadas en nuestra nube.
+
+\jorge{Yo quizá contaría aquí qué escenarios quieres crear y con qué objetivo. Has escrito una descripción de lo que has hecho, más a modo de diario que de definición de objetivos. Revísalo y mira si puedes poner más claramente los objetivos.}
+
+\section{Estructura de la memoria} \label{subchap:estrucutramemoria}
+
+Este documento consta de nueve capítulos que describimos a continuación:
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:introudccion}: Introducción}. Breve explicación del contexto y las razones de llevar a cabo este proyecto así como los objetivos a alcanzar.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:conceptos previos}: Conceptos previos}. En este capítulo se abordarán conceptos y tecnologías relacionadas con las posibilidades que OpenStack ofrece haciendo énfasis en aquellas que atañen a este proyecto.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:estadodelarte}: Estado del arte}. Exploración de las principales soluciones del mercado que existen como alternativa y justificación de la elección.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:planificacionycostes}: Planificación y costes}. Estimación del tiempo, recursos empleados y costes asociados para llevar a cabo el proyecto.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:herramientasutilizadas}: Herramientas utilizadas}. Análisis en profundidad de OpenStack y los principales proyectos que lo componen haciendo énfasis en aquellos que usaremos.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:diseno}: Diseño}. Explicación y justificación de los distintos escenarios planteados para la orquestación de las funciones de red.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:implementacion}: Implementación}. Documentación del proceso seguido para la instalación de la infraestructura y la puesta a punto de los distintos escenarios y servicios planteados.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:pruebas}: Pruebas y resultados}. Realización de diferentes test para corroborar el correcto funcionamiento del despliegue realizado.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Capítulo \ref{chap:conclusiones}: Conclusiones y líneas futuras}. Culminación de la memoria haciendo y repaso de los objetivos alcanzados y prospección de futuras vías para la ampliación del trabajo.
+\end{itemize}
+
+Al final de la memoria, podremos encontrar además distintos apéndices:
+
+\begin{itemize}
+\item \textbf{Apéndice \ref{chap:arquitectura}: Arquitectura lógica de OpenStack}. Arquitectura lógica en la que se muestran los componentes de los principales proyectos de OpenStack y la relación que hay entre ellos.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Apéndice \ref{chap:manualdeinstalacion}: Archivos de configuración para la instalación}. El proceso de instalación de OpenStack con DevStack tiene como elemento principal un archivo de configuración donse se describen los recursos que queremos que tenga nuestra nube. Este tema merece una mención especial y se propone como anexo al proceso de instalación que se verá en la sección \ref{sec:instalacion}.
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Apéndice \ref{chap:creacionescenariobash}: Creación de un escenario mediante scripting en bash}. Generación de un script para automatizar la tarea de configurar un escenario de red desde la línea de comandos.
+\end{itemize}
+
+
+
+
+
+
